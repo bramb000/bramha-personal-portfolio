@@ -4,6 +4,7 @@ import CaseImage from '../components/CaseImage.vue';
 import VideoEmbed from '../components/VideoEmbed.vue';
 import CaseMetric from '../components/CaseMetric.vue';
 import CaseInsight from '../components/CaseInsight.vue';
+import TableOfContents from '../components/TableOfContents.vue';
 
 // Rocksmith Assets
 import traditionalRocksmith from '../assets/images/rocksmith/executive-summary/000_traditional-rocksmith.webp';
@@ -51,8 +52,11 @@ import controlSchemeDesktop from '../assets/images/rocksmith/solution/039_rocksm
 </script>
 
 <template>
-  <div class="animate-fade-in space-y-24 pb-24">
-    <!-- ─── HERO ─── -->
+  <div class="animate-fade-in pb-24 relative">
+    <div class="xl:grid xl:grid-cols-12 xl:gap-8 w-full max-w-7xl mx-auto px-6 xl:px-0">
+      <!-- Main Content Container -->
+      <div class="xl:col-span-8 xl:col-start-1 space-y-24 min-w-0">
+        <!-- ─── HERO ─── -->
     <ProjectHero
       title="Rocksmith+"
       description="Releasing to 1 million new users on 5 platforms with a single, scalable UI system."
@@ -440,5 +444,14 @@ import controlSchemeDesktop from '../assets/images/rocksmith/solution/039_rocksm
       </div>
     </section>
 
+      </div>
+      
+      <!-- ToC Sidebar Container -->
+      <div class="hidden xl:block xl:col-span-3 xl:col-start-10 relative">
+        <div class="sticky top-32 z-30">
+          <TableOfContents />
+        </div>
+      </div>
+    </div>
   </div>
 </template>

@@ -5,6 +5,7 @@ import VideoEmbed from '../components/VideoEmbed.vue';
 import CaseMetric from '../components/CaseMetric.vue';
 import CaseInsight from '../components/CaseInsight.vue';
 import CaseBeforeAfter from '../components/CaseBeforeAfter.vue';
+import TableOfContents from '../components/TableOfContents.vue';
 
 // Guild of Guardians Assets
 import challengeGraphic from '../assets/images/guild/context/000_challenge-graphic-1.png';
@@ -59,8 +60,11 @@ import galAfterAnticipation from '../assets/images/guild/tldr/009_figma-e1njfafc
 </script>
 
 <template>
-  <div class="animate-fade-in space-y-24 pb-24">
-    <!-- ─── HERO ─── -->
+  <div class="animate-fade-in pb-24 relative">
+    <div class="xl:grid xl:grid-cols-12 xl:gap-8 w-full max-w-7xl mx-auto px-6 xl:px-0">
+      <!-- Main Content Container -->
+      <div class="xl:col-span-8 xl:col-start-1 space-y-24 min-w-0">
+        <!-- ─── HERO ─── -->
     <ProjectHero
       title="AFK Rewards for Guild of Guardians"
       description="How data-driven UX design increased D7 retention by 25% and D7 LTV by 12% for a live mobile RPG."
@@ -523,5 +527,14 @@ import galAfterAnticipation from '../assets/images/guild/tldr/009_figma-e1njfafc
       </div>
     </section>
 
+      </div>
+      
+      <!-- ToC Sidebar Container -->
+      <div class="hidden xl:block xl:col-span-3 xl:col-start-10 relative">
+        <div class="sticky top-32 z-30">
+          <TableOfContents />
+        </div>
+      </div>
+    </div>
   </div>
 </template>
