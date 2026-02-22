@@ -477,9 +477,8 @@ import galAfterAnticipation from '../assets/images/guild/tldr/009_figma-e1njfafc
     <!-- ─── RESULTS ─── -->
     <section class="bg-white dark:bg-zinc-900/50 border border-gray-200 dark:border-zinc-800 p-12 rounded-3xl space-y-12 shadow-sm">
       <h2 class="text-4xl font-serif font-bold">Results</h2>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
         <CaseMetric value="+25%" label="D7 Retention Uplift" theme="success" />
-        <CaseMetric value="+200%" label="Players collecting all rewards" theme="success" />
         <CaseMetric value="+12%" label="D7 LTV (Revenue)" theme="success" />
       </div>
       <div class="max-w-3xl mx-auto space-y-6 text-lg leading-relaxed opacity-90">
