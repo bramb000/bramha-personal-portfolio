@@ -91,6 +91,11 @@ const storybookUrl = computed(() => {
   const isDev = import.meta.env.DEV
   // In development, Storybook runs on port 6006. In production, it's built into the /storybook/ subfolder.
   const baseUrl = isDev ? 'http://localhost:6006' : `${import.meta.env.BASE_URL}storybook`
-  return `${baseUrl}/?path=/story/${props.storybookId}`
+  
+  // Convert standard story IDs (e.g. 'sales-modal-full-view--default') 
+  // into document overview IDs ('sales-modal-full-view--docs')
+  const baseComponentId = props.storybookId.split('--')[0]
+  
+  return `${baseUrl}/?path=/docs/${baseComponentId}--docs`
 })
 </script>
