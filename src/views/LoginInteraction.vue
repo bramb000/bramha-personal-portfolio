@@ -4,7 +4,7 @@
     description="A micro-interaction study focusing on state-driven animations. Uses Rive/Lottie for the character that reacts to input focus, typing speed, and password visibility toggles. Demonstrates how small details can enhance user delight."
     :tags="['Vue 3', 'Lottie', 'State Machines', 'Forms']"
     storybook-id="login-micro-interaction-loginavatar--light-mode"
-    container-class="h-[800px] flex items-center justify-center bg-[#f3f4f6]"
+    container-class="h-full min-h-[800px] flex items-center justify-center bg-[#f3f4f6] p-4 sm:p-8"
   >
     <LoginAvatar />
   </ExperimentWrapper>
