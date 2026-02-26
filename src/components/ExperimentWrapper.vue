@@ -114,10 +114,10 @@
         </div>
       </div>
 
-      <!-- MOBILE SIMULATOR (iPhone 16 shape) -->
+      <!-- MOBILE SIMULATOR (iPhone 16 shape - 393x852 inner content) -->
       <div 
         v-else-if="deviceMode === 'mobile'"
-        class="relative border-[14px] border-zinc-900 dark:border-zinc-950 rounded-[3rem] shadow-2xl w-[393px] h-[852px] shrink-0 overflow-hidden ring-1 ring-[var(--color-text-charcoal)]/10 bg-[var(--color-cream-bg)] flex flex-col"
+        class="relative border-[14px] border-zinc-900 dark:border-zinc-950 rounded-[3rem] shadow-2xl w-[393px] h-[852px] shrink-0 overflow-hidden ring-1 ring-[var(--color-text-charcoal)]/10 bg-[var(--color-cream-bg)] flex flex-col box-content"
       >
         <!-- Dynamic Island / Notch Simulation -->
         <div class="absolute top-2 inset-x-0 h-8 z-50 flex justify-center pointer-events-none">
