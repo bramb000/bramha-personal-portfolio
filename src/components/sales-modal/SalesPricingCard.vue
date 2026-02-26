@@ -36,7 +36,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const cardClasses = computed(() => {
   return [
-    'flex flex-col rounded-[2rem] p-6 lg:p-8 bg-[#0b0b12]/90 backdrop-blur-2xl transition-all duration-500 relative h-full w-full hover:z-50 focus-within:z-50',
+    'flex flex-col rounded-3xl p-5 @xl:p-6 bg-[#0b0b12]/90 backdrop-blur-2xl transition-all duration-500 relative h-full w-full hover:z-50 focus-within:z-50',
     isSelected.value 
       ? 'border border-[rgba(168,85,247,0.5)] shadow-[0_0_80px_-15px_rgba(168,85,247,0.3)] bg-white/[0.04]' 
       : 'border border-white/5 hover:border-white/10 hover:bg-white/[0.03]'
@@ -131,28 +131,28 @@ watch(targetPrice, (newVal) => {
     <div class="flex flex-col flex-1 h-full select-none">
       
       <!-- Headers -->
-      <div class="flex flex-col gap-2 items-start justify-center w-full mb-6 min-h-[64px] shrink-0 z-10">
-        <h3 class="text-xl sm:text-2xl font-medium font-['Inter'] text-white leading-tight">{{ title }}</h3>
-        <p class="text-sm font-normal font-['Inter'] text-slate-400 leading-snug text-left max-w-xs">{{ subtitle }}</p>
+      <div class="flex flex-col gap-1.5 items-start justify-center w-full mb-4 h-[72px] shrink-0 z-10">
+        <h3 class="text-lg @sm:text-xl font-medium font-['Outfit'] text-white leading-tight">{{ title }}</h3>
+        <p class="text-xs @sm:text-sm font-normal font-['Outfit'] text-slate-400 leading-snug text-left max-w-xs">{{ subtitle }}</p>
       </div>
 
       <!-- Price -->
-      <div class="flex flex-col items-start justify-center w-full text-left mb-8 h-[112px] shrink-0 z-10">
-        <div class="flex items-start justify-start w-full leading-none mb-2 mt-2">
-          <span v-if="!isCustom" class="text-xl font-medium font-['Inter'] text-white mt-1 sm:mt-2 mr-0.5">$</span>
-          <span v-if="!isCustom" class="text-6xl sm:text-7xl font-semibold font-['Inter'] text-white tracking-tighter tabular-nums">{{ formattedPrice }}</span>
-          <span v-else class="text-4xl sm:text-5xl font-semibold font-['Inter'] text-white tracking-tight">{{ formattedPrice }}</span>
-          <span v-if="!isCustom" class="ml-2 text-sm font-normal font-['Inter'] text-slate-500 self-center mt-2">/month</span>
+      <div class="flex flex-col items-start justify-center w-full text-left mb-6 h-[104px] shrink-0 z-10">
+        <div class="flex items-start justify-start w-full leading-none mb-2 mt-1">
+          <span v-if="!isCustom" class="text-lg font-medium font-['Outfit'] text-white mt-1 mr-0.5">$</span>
+          <span v-if="!isCustom" class="text-5xl @sm:text-6xl font-semibold font-['Outfit'] text-white tracking-tighter tabular-nums">{{ formattedPrice }}</span>
+          <span v-else class="text-3xl @sm:text-4xl font-semibold font-['Outfit'] text-white tracking-tight">{{ formattedPrice }}</span>
+          <span v-if="!isCustom" class="ml-2 text-xs @sm:text-sm font-normal font-['Outfit'] text-slate-500 self-center mt-2">/month</span>
         </div>
-        <p class="text-xs font-normal font-['Inter'] text-slate-500 leading-tight whitespace-pre-wrap text-left max-w-[200px]">{{ billingSubtext }}</p>
+        <p class="text-[11px] @sm:text-xs font-normal font-['Outfit'] text-slate-500 leading-tight whitespace-pre-wrap text-left max-w-[200px]">{{ billingSubtext }}</p>
       </div>
 
       <!-- Action Button -->
-      <div class="w-full flex items-center justify-center mb-6 z-10 shrink-0">
+      <div class="w-full flex items-center justify-center mb-5 z-10 shrink-0">
         <SalesButton 
           :variant="buttonVariant" 
-          size="lg"
-          class="h-12 w-full"
+          size="md"
+          class="h-10 @sm:h-12 w-full text-xs @sm:text-sm"
           fullWidth
           @click="$emit('select')"
         >
@@ -161,7 +161,7 @@ watch(targetPrice, (newVal) => {
       </div>
 
       <!-- Divider -->
-      <hr class="w-full border-white/5 mb-6 z-10" />
+      <hr class="w-full border-white/5 mb-5 z-10" />
 
       <!-- Features List -->
       <div class="flex flex-col gap-4 w-full z-10 relative mb-4">
@@ -170,12 +170,12 @@ watch(targetPrice, (newVal) => {
             <Star v-if="feature.isHighlighted" class="w-5 h-5 shrink-0 mt-0.5 text-amber-400 fill-amber-400" />
             <Check v-else class="w-5 h-5 shrink-0 mt-0.5 text-purple-600" />
             
-            <span v-if="feature.isHighlighted" class="text-sm font-medium font-['Inter'] text-amber-200 bg-amber-500/10 px-2 py-1 rounded-md flex items-center leading-snug shadow-sm border border-amber-500/20">
+            <span v-if="feature.isHighlighted" class="text-xs @sm:text-sm font-medium font-['Outfit'] text-amber-200 bg-amber-500/10 px-2 py-1 rounded-md flex items-center leading-snug shadow-sm border border-amber-500/20">
               {{ feature.name }}
               <SalesTooltip v-if="feature.tooltip" :text="feature.tooltip" class="ml-1.5" />
             </span>
 
-            <span v-else class="text-sm font-normal font-['Inter'] text-slate-300 flex items-center flex-wrap leading-snug">
+            <span v-else class="text-xs @sm:text-sm font-normal font-['Outfit'] text-slate-300 flex items-center flex-wrap leading-snug">
               {{ feature.name }}
               <SalesTooltip v-if="feature.tooltip" :text="feature.tooltip" class="ml-1.5" />
             </span>
@@ -184,8 +184,8 @@ watch(targetPrice, (newVal) => {
       </div>
 
       <!-- Badge area (Insights render directly after features) -->
-      <div v-if="badgeType !== 'none' && badgePrefix" class="w-full flex items-start justify-start pt-4 shrink-0 z-10">
-        <SalesBadge :variant="badgeType" icon="lightbulb" class="w-full text-left justify-start items-start">
+      <div v-if="badgeType !== 'none' && badgePrefix" class="w-full flex items-start justify-start pt-3 shrink-0 z-10">
+        <SalesBadge :variant="badgeType" class="w-full text-left justify-start items-start">
           {{ badgePrefix }}
           <template v-if="badgeBaseCost">
             <span class="tabular-nums font-semibold">${{ formattedBadgeNumeric }}</span>{{ badgeSuffix }}

@@ -5,6 +5,7 @@
     storybook-id="node-graph-full-canvas--light-mode"
     footer-note="Tip: Use the scroll wheel to zoom and middle-mouse button to pan."
     container-class="h-[75vh] min-h-[600px] relative"
+    :supported-devices="['desktop']"
   >
     <template #description>
       A canvas-based node editor built from scratch in Vue. Features include infinite panning, smooth zooming, bezier wire connections, and a reactive data flow engine.

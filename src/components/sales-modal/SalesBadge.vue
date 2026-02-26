@@ -25,7 +25,7 @@ const variantClasses = computed(() => {
 </script>
 
 <template>
-  <div :class="['group flex items-start p-3 sm:p-4 rounded-2xl text-xs sm:text-sm leading-relaxed backdrop-blur-md relative overflow-hidden transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_8px_16px_rgba(0,0,0,0.4)]', variantClasses]">
+  <div :class="['group flex items-start p-3 @sm:p-3.5 rounded-xl text-xs @sm:text-sm leading-snug backdrop-blur-md relative overflow-hidden transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_8px_16px_rgba(0,0,0,0.4)]', variantClasses]">
     <!-- Inner lighting effect -->
     <div class="absolute inset-0 rounded-2xl ring-1 ring-inset ring-white/10 pointer-events-none mix-blend-overlay"></div>
     
