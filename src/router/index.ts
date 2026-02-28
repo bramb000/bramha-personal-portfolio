@@ -63,6 +63,11 @@ const routes = [
         path: '/micro-projects/sales-modal',
         name: 'SalesModal',
         component: () => import('../views/SalesModalView.vue')
+    },
+    {
+        path: '/micro-projects/voice-chat',
+        name: 'VoiceChatSimulation',
+        component: () => import('../views/VoiceChatSimulation.vue')
     }
 ]
 

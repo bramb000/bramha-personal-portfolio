@@ -6,6 +6,13 @@ const filters = ['All', 'Web Design', 'Game Design']
 
 const projects = [
   {
+    id: 'voice-chat',
+    title: 'AI Voice Chat Simulation',
+    description: 'Neumorphic exploration of ethereal braille micro-interactions that float and pulse like fluid sand.',
+    route: '/micro-projects/voice-chat',
+    category: 'Web Design'
+  },
+  {
     id: 'sales-modal',
     title: 'Component-Driven Sales Modal',
     description: 'A beautifully responsive, isolated pricing modal highlighting dynamic, contextual data-driven banners.',
