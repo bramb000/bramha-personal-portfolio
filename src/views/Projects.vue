@@ -8,7 +8,7 @@ const projects = [
   {
     id: 'voice-chat',
     title: 'AI Voice Chat Simulation',
-    description: 'Neumorphic exploration of ethereal braille micro-interactions that float and pulse like fluid sand.',
+    description: 'Bringing your personal assistant to life in a concept that explorates visual communication alongside conversations.',
     route: '/micro-projects/voice-chat',
     category: 'Web Design'
   },
@@ -22,7 +22,7 @@ const projects = [
   {
     id: 'login',
     title: 'Login Micro-Interaction',
-    description: 'A playful login screen featuring a Rive-style animated avatar that tracks your input.',
+    description: 'A playful login screen featuring a Lottie animated avatar that tracks your input.',
     route: '/login-interaction-1',
     category: 'Web Design'
   },
