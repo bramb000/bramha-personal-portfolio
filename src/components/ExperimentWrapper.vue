@@ -125,7 +125,7 @@
         </div>
 
         <!-- The @container is crucial here as well. -->
-        <div class="@container w-full h-full overflow-y-auto overflow-x-hidden no-scrollbar pt-12 pb-8" :class="containerClass">
+        <div class="@container w-full h-full overflow-y-auto overflow-x-hidden no-scrollbar" :class="containerClass">
           <slot></slot>
         </div>
       </div>

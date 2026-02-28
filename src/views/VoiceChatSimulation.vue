@@ -7,7 +7,7 @@
     container-class="h-full w-full"
   >
     <!-- Moved wrapper classes INSIDE the component so Vue's style scoped attributes apply correctly -->
-    <div class="w-full h-full flex items-center justify-center voice-sim-wrapper relative rounded-xl sm:rounded-none overflow-hidden">
+    <div class="w-full h-full flex items-center justify-center voice-sim-wrapper relative rounded-xl sm:rounded-none">
         <VoiceChatComponent />
     </div>
   </ExperimentWrapper>

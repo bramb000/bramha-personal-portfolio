@@ -483,6 +483,12 @@ const handleMouseMove = (e: MouseEvent) => {
     }
 }
 
+const triggerNudge = (text: string) => {
+    isTyping.value = true
+    manualInputText.value = text
+    resetIdleHintTimer()
+}
+
 onMounted(() => {
   window.addEventListener('resize', resizeCanvas)
   resizeCanvas() // Initial size setup
@@ -504,86 +510,111 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="voice-component-inner relative flex flex-col items-center justify-center p-6 w-full h-full">
+  <div class="voice-component-inner relative flex flex-col justify-between p-4 sm:p-6 w-full h-full min-h-[480px] overflow-y-auto no-scrollbar">
     
-    <!-- The Neumorphic Central Container -->
-    <div 
-      class="neumorphic-orb relative rounded-full flex items-center justify-center transition-all duration-700 ease-[cubic-bezier(0.25,0.8,0.25,1)] shrink-0"
-      :class="[
-        currentState !== 'idle' ? 'active-inset scale-95' : 'idle-outset scale-100',
-        'w-64 h-64 md:w-80 md:h-80'
-      ]"
-      @click="handleAction"
-      @mouseenter="isHovering = true"
-       @mouseleave="isHovering = false"
-      @mousemove="handleMouseMove"
-      role="button"
-      :aria-label="(currentState === 'idle' || currentState === 'idle_hint') ? 'Start listening' : 'Stop interaction'"
-    >
-      <!-- Canvas for the floating braille marks -->
-      <canvas 
-        ref="canvasRef" 
-        class="absolute inset-x-0 inset-y-0 w-full h-full rounded-full z-10 pointer-events-none"
-      ></canvas>
-
-      <!-- Inner glow for active states -->
-      <div 
-        class="absolute inset-x-0 inset-y-0 rounded-full transition-opacity duration-1000 mix-blend-screen"
-        :class="{
-            'opacity-0': currentState === 'idle' || currentState === 'idle_hint',
-            'opacity-40 bg-cyan-400/20 blur-xl': currentState === 'listening',
-            'opacity-50 bg-fuchsia-400/20 blur-xl': currentState === 'processing',
-            'opacity-60 bg-cyan-300/30 blur-2xl': currentState === 'speaking'
-        }"
-      ></div>
-    </div>
-    
-    <!-- Status Text -->
-    <div class="mt-14 h-8 text-center flex flex-col items-center justify-center">
-        <p class="font-sans text-xs tracking-[0.2em] uppercase font-bold transition-all duration-500"
-           :class="(currentState === 'idle' || currentState === 'idle_hint') ? 'opacity-30' : 'opacity-100 text-cyan-500 drop-shadow-md scale-105'">
-            <span v-if="currentState === 'idle' || currentState === 'idle_hint'">
-                {{ isMobile ? 'Tap to awaken me' : 'Click to awaken me' }}
-            </span>
-            <span v-else>
-                {{ currentState }}
-            </span>
-        </p>
+    <!-- Top Row: Suggested Nudges -->
+    <div class="w-full flex justify-center gap-3 z-20 shrink-0 opacity-0 animate-[fadeIn_0.5s_ease_0.5s_forwards] pointer-events-auto">
+      <button @click="triggerNudge('How do I make an omelette?')" class="neo-btn px-4 py-2 rounded-full text-xs font-bold tracking-wider transition-all hover:text-cyan-500">
+        🍳 Omelette
+      </button>
+      <button @click="triggerNudge('Book flights')" class="neo-btn px-4 py-2 rounded-full text-xs font-bold tracking-wider transition-all hover:text-cyan-500">
+        ✈️ Flights
+      </button>
     </div>
 
-    <!-- Keyboard Fallback -->
-    <div class="mt-10 h-16 flex flex-col items-center justify-center transition-all duration-500 w-full max-w-sm">
-        <transition name="fade" mode="out-in">
-            <button 
-                v-if="(currentState === 'idle' || currentState === 'idle_hint') && !isTyping"
-                @click="isTyping = true; resetIdleHintTimer()"
-                class="neo-btn rounded-full px-6 py-2 text-[10px] font-sans uppercase tracking-[0.15em] font-semibold opacity-70 hover:opacity-100 transition-all"
-            >
-                Use text instead
-            </button>
-            
-            <form v-else-if="isTyping" @submit.prevent="handleManualSubmit" class="flex items-center gap-4 w-full px-4">
-                <input 
-                    type="text" 
-                    v-model="manualInputText"
-                    placeholder="Enter command..."
-                    class="neo-input flex-1 rounded-full px-6 py-3 text-sm font-sans focus:outline-none placeholder-gray-400 dark:placeholder-gray-500 transition-all focus:ring-2 focus:ring-cyan-500/20"
-                    autofocus
-                />
+    <!-- Center flex-1 Container to hold Orb -->
+    <div class="flex-1 flex flex-col items-center justify-center w-full z-10 py-2 sm:py-4">
+        <!-- The Neumorphic Central Container -->
+        <div 
+          class="neumorphic-orb relative rounded-full flex items-center justify-center transition-all duration-700 ease-[cubic-bezier(0.25,0.8,0.25,1)] shrink-0"
+          :class="[
+            currentState !== 'idle' ? 'active-inset scale-95' : 'idle-outset scale-100',
+            'w-56 h-56 md:w-72 md:h-72'
+          ]"
+          @click="handleAction"
+          @mouseenter="isHovering = true"
+           @mouseleave="isHovering = false"
+          @mousemove="handleMouseMove"
+          role="button"
+          :aria-label="(currentState === 'idle' || currentState === 'idle_hint') ? 'Start listening' : 'Stop interaction'"
+        >
+          <!-- Canvas for the floating braille marks -->
+          <canvas 
+            ref="canvasRef" 
+            class="absolute inset-x-0 inset-y-0 w-full h-full rounded-full z-10 pointer-events-none"
+          ></canvas>
+
+          <!-- Inner glow for active states -->
+          <div 
+            class="absolute inset-x-0 inset-y-0 rounded-full transition-opacity duration-1000 mix-blend-screen"
+            :class="{
+                'opacity-0': currentState === 'idle' || currentState === 'idle_hint',
+                'opacity-40 bg-cyan-400/20 blur-xl': currentState === 'listening',
+                'opacity-50 bg-fuchsia-400/20 blur-xl': currentState === 'processing',
+                'opacity-60 bg-cyan-300/30 blur-2xl': currentState === 'speaking'
+            }"
+          ></div>
+        </div>
+        
+        <!-- Status Text -->
+        <div class="mt-6 md:mt-8 h-8 text-center flex flex-col items-center justify-center">
+            <p class="font-sans text-xs tracking-[0.2em] uppercase font-bold transition-all duration-500"
+               :class="(currentState === 'idle' || currentState === 'idle_hint') ? 'opacity-30' : 'opacity-100 text-cyan-500 drop-shadow-md scale-105'">
+                <span v-if="currentState === 'idle' || currentState === 'idle_hint'">
+                    {{ isMobile ? 'Tap to awaken me' : 'Click to awaken me' }}
+                </span>
+                <span v-else>
+                    {{ currentState }}
+                </span>
+            </p>
+        </div>
+    </div>
+
+    <!-- Bottom Action Bar -->
+    <div class="w-full flex items-center justify-between z-20 shrink-0 gap-4 pointer-events-auto pb-2">
+        <!-- Left FAB (+) -->
+        <button class="neo-btn shrink-0 w-12 h-12 rounded-full flex items-center justify-center group hover:text-cyan-500 transition-colors" aria-label="Add new">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform group-hover:rotate-90"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+        </button>
+        
+        <!-- Center Keyboard Fallback -->
+        <div class="flex-1 max-w-[240px] flex justify-center min-h-[44px]">
+            <transition name="fade" mode="out-in">
                 <button 
-                    type="submit" 
-                    class="neo-btn rounded-full w-11 h-11 flex items-center justify-center transition-all group hover:text-cyan-500"
-                    aria-label="Send text command"
+                    v-if="(currentState === 'idle' || currentState === 'idle_hint') && !isTyping"
+                    @click="isTyping = true; resetIdleHintTimer()"
+                    class="neo-btn rounded-full px-6 py-2 text-[10px] font-sans uppercase tracking-[0.15em] font-semibold opacity-70 hover:opacity-100 transition-all w-full"
                 >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="translate-x-[1px] group-hover:scale-110 transition-transform">
-                        <path d="m22 2-7 20-4-9-9-4Z"/>
-                        <path d="M22 2 11 13"/>
-                    </svg>
+                    Use text instead
                 </button>
-            </form>
-        </transition>
-    </div>
+                
+                <form v-else-if="isTyping" @submit.prevent="handleManualSubmit" class="flex items-center gap-2 w-full">
+                    <input 
+                        type="text" 
+                        v-model="manualInputText"
+                        placeholder="Type..."
+                        class="neo-input flex-1 rounded-full px-4 py-2 text-sm font-sans focus:outline-none placeholder-gray-400 dark:placeholder-gray-500 transition-all focus:ring-2 focus:ring-cyan-500/20 w-full"
+                        autofocus
+                    />
+                    <button 
+                        type="submit" 
+                        class="neo-btn shrink-0 rounded-full w-10 h-10 flex items-center justify-center transition-all group hover:text-cyan-500"
+                        aria-label="Send text command"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="translate-x-[1px] group-hover:scale-110 transition-transform">
+                            <path d="m22 2-7 20-4-9-9-4Z"/>
+                            <path d="M22 2 11 13"/>
+                        </svg>
+                    </button>
+                </form>
+            </transition>
+        </div>
 
+        <!-- Right FAB (Settings) -->
+        <button class="neo-btn shrink-0 w-12 h-12 rounded-full flex items-center justify-center group hover:text-cyan-500 transition-colors" aria-label="Settings">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform group-hover:rotate-45"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+    </div>
   </div>
 </template>
 
