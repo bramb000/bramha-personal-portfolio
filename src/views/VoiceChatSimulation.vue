@@ -4,9 +4,12 @@
     description="A Neumorphic exploration of ethereal braille micro-interactions. The central UI features fluid 'braille marks' that represent an AI's state. These marks merge and shape themselves based on listening, processing, and speaking states, while remaining independently animated like floating sand."
     :tags="['Vue 3', 'HTML Canvas', 'Neumorphism', 'Web Speech API']"
     storybook-id="none"
-    container-class="w-full flex items-center justify-center min-h-[600px] voice-sim-wrapper relative p-8"
+    container-class="h-full w-full"
   >
-    <VoiceChatComponent />
+    <!-- Moved wrapper classes INSIDE the component so Vue's style scoped attributes apply correctly -->
+    <div class="w-full h-full flex items-center justify-center voice-sim-wrapper relative rounded-xl sm:rounded-none overflow-hidden">
+        <VoiceChatComponent />
+    </div>
   </ExperimentWrapper>
 </template>
 
@@ -18,22 +21,14 @@ import VoiceChatComponent from '../components/VoiceChatComponent.vue';
 <style scoped>
 /* Wrapper styles to ensure the embedded Neumorphic style blends correctly */
 .voice-sim-wrapper {
-    background-color: var(--neo-bg);
-    color: var(--neo-text);
-    transition: background-color 0.5s ease, color 0.5s ease;
-}
-
-:global(:root) {
-    --neo-bg: #E6E9EF;
-    --neo-text: #2A2A2A;
-    --neo-shadow-light: #ffffff;
-    --neo-shadow-dark: rgba(166, 171, 189, 0.6);
-}
-
-:global(:root.dark) {
+    /* Define the variables locally, forcing a sleek dark theme by default */
     --neo-bg: #1e2024;
     --neo-text: #E6E9EF;
     --neo-shadow-light: #2a2d33;
     --neo-shadow-dark: #121417;
+    
+    background-color: var(--neo-bg);
+    color: var(--neo-text);
+    transition: background-color 0.5s ease, color 0.5s ease;
 }
 </style>

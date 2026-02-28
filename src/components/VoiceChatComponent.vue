@@ -1,32 +1,144 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 
-type ChatState = 'idle' | 'listening' | 'processing' | 'speaking'
+type ChatState = 'idle' | 'idle_hint' | 'listening' | 'processing' | 'speaking' | 'navigating' | 'cooking' | 'booking' | 'confused'
 
 const currentState = ref<ChatState>('idle')
+const isSpeaking = ref(false)
 const canvasRef = ref<HTMLCanvasElement | null>(null)
+const isHovering = ref(false)
+const mouseX = ref(0)
+const mouseY = ref(0)
+const isMobile = ref(false)
+const isTyping = ref(false)
+const manualInputText = ref("")
 let animationFrameId: number
+let idleHintTimeout: ReturnType<typeof setTimeout> | null = null
+
+const resetIdleHintTimer = () => {
+    if (idleHintTimeout) clearTimeout(idleHintTimeout)
+    
+    // Only set the hint timer if we're actually in idle
+    if (currentState.value === 'idle') {
+        idleHintTimeout = setTimeout(() => {
+            // Trigger the pointer animation
+            currentState.value = 'idle_hint'
+            
+            // Revert back to idle after 2.5 seconds
+            setTimeout(() => {
+                if (currentState.value === 'idle_hint') {
+                    currentState.value = 'idle'
+                    resetIdleHintTimer() // start counting again
+                }
+            }, 2500)
+        }, 6000) // 6 seconds of inactivity
+    }
+}
 
 // Mock the SpeechSynthesis API for the voice reply
-const speechLine = "I am a simulated voice reply. There is no logic here."
+// Store the dynamic reply text
+const dynamicSpeechLine = ref("I am a simulated voice reply. There is no logic here.")
+
+// Speech Recognition Reference
+let recognition: any = null
 
 const handleAction = () => {
-  if (currentState.value === 'idle') {
-    currentState.value = 'listening'
-    // Simulate listening for 3 seconds
-    setTimeout(() => {
-      currentState.value = 'processing'
-      // Simulate processing for 2 seconds
-      setTimeout(() => {
-        currentState.value = 'speaking'
-        speakLine()
-      }, 2000)
-    }, 3000)
-  } else if (currentState.value === 'speaking') {
+  if (currentState.value === 'idle' || currentState.value === 'idle_hint') {
+    startListening()
+  } else if (isSpeaking.value) {
     // allow interrupt
     window.speechSynthesis.cancel()
+    isSpeaking.value = false
     currentState.value = 'idle'
+    resetIdleHintTimer()
   }
+}
+
+const startListening = () => {
+  // Check for browser support
+  const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+  
+  if (!SpeechRecognition) {
+      alert("Speech Recognition API is not supported in this browser. Please try Chrome, Edge, or Safari.")
+      return
+  }
+
+  recognition = new SpeechRecognition()
+  recognition.lang = 'en-US'
+  recognition.interimResults = false // only wait for the final string
+  recognition.maxAlternatives = 1
+
+  recognition.onstart = () => {
+      currentState.value = 'listening'
+      if (idleHintTimeout) clearTimeout(idleHintTimeout) // kill idle hint
+  }
+
+  recognition.onresult = (event: any) => {
+      const transcript = event.results[0][0].transcript.toLowerCase()
+      currentState.value = 'processing'
+      
+      // Give a tiny beat for the "processing" swirl before answering
+      setTimeout(() => {
+          routeKeyword(transcript)
+      }, 1500)
+  }
+
+  recognition.onerror = (event: any) => {
+      console.error("Speech recognition error", event.error)
+      // On error (like mic blocked) fallback to idle
+      currentState.value = 'idle'
+  }
+
+  recognition.onend = () => {
+      // If we stopped listening but aren't processing a result, go back to idle
+      if (currentState.value === 'listening') {
+          currentState.value = 'idle'
+          resetIdleHintTimer()
+      }
+  }
+
+  recognition.start()
+}
+
+const handleManualSubmit = () => {
+    if (!manualInputText.value.trim()) {
+        isTyping.value = false
+        return
+    }
+    
+    // Simulate processing phase
+    currentState.value = 'processing'
+    isTyping.value = false
+    
+    // Slight delay to feel natural before firing the keyword route
+    setTimeout(() => {
+        routeKeyword(manualInputText.value.toLowerCase())
+        manualInputText.value = ""
+    }, 1000)
+}
+
+const routeKeyword = (transcript: string) => {
+    // We pass the intended shape to the speakLine so that when speech ends,
+    // the system knows to go to 'idle' instead of leaving the shape
+    if (transcript.includes('how do i get to') || transcript.includes('directions to')) {
+        currentState.value = 'navigating'
+        dynamicSpeechLine.value = "Go straight and turn right in 500 metres."
+    } else if (transcript.includes('omelette') || transcript.includes('cook') || transcript.includes('recipe')) {
+        currentState.value = 'cooking'
+        dynamicSpeechLine.value = "Crack and whisk an egg, then add it to a pan for 2 minutes."
+    } else if (transcript.includes('book me flights') || transcript.includes('book a flight')) {
+        currentState.value = 'booking'
+        dynamicSpeechLine.value = "Should I book you a flight on the Saturday, 7 p.m.?"
+    } else {
+        currentState.value = 'confused'
+        dynamicSpeechLine.value = "I am sorry, I cannot understand that."
+    }
+    
+    // Give the particles time to form the SVG shape, then speak
+    setTimeout(() => {
+        isSpeaking.value = true
+        speakLine()
+    }, 2000)
 }
 
 const speakLine = () => {
@@ -39,7 +151,7 @@ const speakLine = () => {
     return
   }
   
-  const utterance = new SpeechSynthesisUtterance(speechLine)
+  const utterance = new SpeechSynthesisUtterance(dynamicSpeechLine.value)
   
   // try to find a nice English voice
   const voices = synth.getVoices()
@@ -57,10 +169,72 @@ const speakLine = () => {
   if (preferredVoice) utterance.voice = preferredVoice
   
   utterance.onend = () => {
+    isSpeaking.value = false
     currentState.value = 'idle'
+    resetIdleHintTimer()
   }
   
+  // Optional: when the voice ends, we could return to idle.
+  // For now, let it return to idle after speech completes.
   synth.speak(utterance)
+}
+
+// SVG Path parsing
+// A few example paths for different custom states (scaled around a 24x24 viewport, will be rescaled to canvas)
+const SVG_PATHS = {
+    car: 'M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2 M7 17a2 2 0 1 0 4 0 2 2 0 1 0-4 0 M15 17a2 2 0 1 0 4 0 2 2 0 1 0-4 0', // Lucide Car
+    question: 'M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3 M12 17h.01', // Lucide Circle Help (inner)
+    chefHat: 'M6 13.87A4 4 0 0 1 7.41 6a5.11 5.11 0 0 1 1.05-1.54 5 5 0 0 1 7.08 0A5.11 5.11 0 0 1 16.59 6 4 4 0 0 1 18 13.87V21H6Z M6 17h12', // Lucide Chef Hat
+    plane: 'M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.2-1.1.6L2.5 9l8.1 4.5L6 18l-3-1-2 2 5 2 2 5 2-2-1-3 4.5-4.6 4.5 8.1c.3.5.8.5 1.2.3l2.2-1.2c.4-.2.6-.7.5-1.2z', // Lucide Plane
+    pointer: 'M18.84 15.87l-4.54-2.26c-.17-.07-.35-.11-.54-.11H13V7.5c0-.83-.67-1.5-1.5-1.5S10 6.67 10 7.5v10.74l-3.43-.72c-.08-.01-.15-.03-.24-.03-.31 0-.59.13-.79.33l-.79.8 4.94 4.94c.27.27.65.44 1.04.44h6.79c.75 0 1.33-.55 1.44-1.28l.75-5.27c.01-.07.02-.14.02-.2 0-.62-.38-1.16-.91-1.38z' // Material Touch App (Hand only)
+}
+let svgPointsCache: Record<string, {x: number, y: number}[]> = {}
+
+const getPointsFromPath = (pathString: string, count: number): {x: number, y: number}[] => {
+    if (svgPointsCache[pathString] && svgPointsCache[pathString].length === count) {
+        return svgPointsCache[pathString];
+    }
+    
+    const svgNS = "http://www.w3.org/2000/svg"
+    // Split the path into subpaths by 'M' or 'm' to ensure disconnected shapes (like dots or wheels)
+    // are calculated separately, preventing them from being skipped by path length logic.
+    const subpaths = pathString.match(/[Mm][^Mm]*/g) || [pathString]
+    
+    const pathsData = subpaths.map(chunk => {
+        const el = document.createElementNS(svgNS, "path")
+        el.setAttribute('d', chunk.trim())
+        try {
+            const realLength = el.getTotalLength()
+            // Give 0-length subpaths (like period dots) an artificial length of 15 so they get particles allocated
+            return { el, length: Math.max(realLength, 15), realLength }
+        } catch(e) {
+            return { el, length: 15, realLength: 0 }
+        }
+    })
+    
+    // Total aggregate length
+    const totalLength = pathsData.reduce((sum, p) => sum + p.length, 0)
+    const points: {x: number, y: number}[] = []
+    
+    pathsData.forEach(p => {
+        // Distribute particle allowance based on relative subpath length
+        const subCount = Math.floor((p.length / totalLength) * count)
+        for(let i=0; i<subCount; i++) {
+            // Space dots evenly across the exact pixel length
+            const fraction = subCount > 1 ? (i / (subCount - 1)) : 0
+            const pt = p.el.getPointAtLength(fraction * p.realLength)
+            points.push({x: pt.x, y: pt.y})
+        }
+    })
+    
+    // Fill remaining caused by flooring fraction
+    while(points.length < count) {
+        points.push(points[points.length-1] || {x: 12, y: 12})
+    }
+    
+    const finalPoints = points.slice(0, count)
+    svgPointsCache[pathString] = finalPoints
+    return finalPoints
 }
 
 // Particle System for "Ethereal Braille Marks"
@@ -94,15 +268,34 @@ class Particle {
   }
 
   update(state: ChatState, time: number, cx: number, cy: number, audioLevel: number) {
+    // Determine target shape based on state and tighten constraints for SVG shapes
+    const isStrictShape = state === 'navigating' || state === 'confused' || state === 'cooking' || state === 'booking' || state === 'idle_hint'
+    // Crisp shapes get almost no wandering blur (1.5) compared to the default fluid blur (10)
+    const wanderIntensity = isStrictShape ? 1.5 : 10
+    
     // In all states, the particles are "alive" with some base noise/wandering
-    const wanderX = Math.sin(time * 0.001 + this.offset) * 10
-    const wanderY = Math.cos(time * 0.001 + this.offset) * 10
+    const wanderX = Math.sin(time * 0.001 + this.offset) * wanderIntensity
+    const wanderY = Math.cos(time * 0.001 + this.offset) * wanderIntensity
     
     // Determine target shape based on state
     if (state === 'idle') {
-      // Dispersed wavelike pattern
-      this.targetX = this.baseX + Math.sin(time * 0.0005 + this.baseY * 0.01) * 30
-      this.targetY = this.baseY + Math.cos(time * 0.0005 + this.baseX * 0.01) * 30
+      // Gentle floating, drawn toward mouse if hovering
+      const restX = this.baseX + Math.sin(time * 0.0005 + this.baseY * 0.01) * 30
+      const restY = this.baseY + Math.cos(time * 0.0005 + this.baseX * 0.01) * 30
+      
+      if (isHovering.value) {
+          // Gently pull towards mouse cursor (weak gravity)
+          const dx = mouseX.value - restX
+          const dy = mouseY.value - restY
+          const dist = Math.sqrt(dx*dx + dy*dy)
+          // The farther away, the weaker the pull (max pull radius ~250px)
+          const pull = Math.max(0, 1 - dist/250) * 0.6 // Increased pull strength
+          this.targetX = restX + dx * pull
+          this.targetY = restY + dy * pull
+      } else {
+          this.targetX = restX
+          this.targetY = restY
+      }
       
     } else if (state === 'listening') {
       // Pull together to form a listening ring, reacting to simulated mic input (audioLevel)
@@ -126,6 +319,44 @@ class Particle {
       this.targetX = cx + (this.baseX - cx) * 0.5 + Math.sin(time * 0.005 + bandY * 0.05) * waveAmplitude
       this.targetY = bandY
       this.angle += this.speed
+      
+    } else if (state === 'navigating' || state === 'confused' || state === 'cooking' || state === 'booking' || state === 'idle_hint') {
+       // Grab the precomputed SVG points
+       let pathStr = SVG_PATHS.question
+       if (state === 'navigating') pathStr = SVG_PATHS.car
+       if (state === 'cooking') pathStr = SVG_PATHS.chefHat
+       if (state === 'booking') pathStr = SVG_PATHS.plane
+       if (state === 'idle_hint') pathStr = SVG_PATHS.pointer
+       
+       // We'll use the particle's tracking offset (which we multiply to expand its range) mapped to the point count
+       // so the stars distribute across the entire length of the path.
+       const pts = getPointsFromPath(pathStr, 800) // Much higher resolution cache pool
+       const idx = Math.floor(this.offset * 100) % pts.length
+       let pt = pts[idx]
+       
+       // SVG is usually 24x24 box. We need to center and scale it up.
+       let scale = 5
+       
+       // Add a "clicking" animation bounce if it's the idle hint
+       let clickBounceY = 0
+       let clickBounceX = 0
+       if (state === 'idle_hint') {
+           // Smooth tapping animation (Hand Pointer)
+           const tapPhase = (time * 0.003) % (Math.PI * 2)
+           if (tapPhase > Math.PI * 1.8) {
+               // Subtly press down into the screen (simulating a tap)
+               scale = 4.7
+               clickBounceY = 2 
+               clickBounceX = 0
+           } else {
+               // Hovering gracefully
+               scale = 5
+               clickBounceY = Math.sin(time * 0.006) * -4
+           }
+       }
+       
+       this.targetX = cx + (pt.x - 12) * scale + clickBounceX
+       this.targetY = cy + (pt.y - 12) * scale + clickBounceY
     }
 
     // Add the wander noise to the target
@@ -133,34 +364,46 @@ class Particle {
     const finalTargetY = this.targetY + wanderY
 
     // Fluid ease towards target
-    this.x += (finalTargetX - this.x) * 0.05
-    this.y += (finalTargetY - this.y) * 0.05
+    // Mouse hover uses a very slow ease so it feels "gentle", shapes use faster ease
+    const ease = (state === 'idle' && isHovering.value) ? 0.015 : 0.05
+    this.x += (finalTargetX - this.x) * ease
+    this.y += (finalTargetY - this.y) * ease
   }
 
-  draw(ctx: CanvasRenderingContext2D, isDark: boolean, audioLevel: number, state: ChatState) {
+  draw(ctx: CanvasRenderingContext2D, audioLevel: number, state: ChatState, time: number) {
     ctx.beginPath()
     ctx.arc(this.x, this.y, this.size + (audioLevel * 0.1), 0, Math.PI * 2)
     
     // Choose color based on state and theme
     let r, g, b, a;
-    if (state === 'listening' || state === 'speaking') {
-       // Cyan/Accent glow
-       r = 0; g = 240; b = 255; a = 0.8 + audioLevel * 0.2;
-    } else if (state === 'processing') {
-       // Purple/Pink processing glow
-       r = 180; g = 100; b = 255; a = 0.8;
+    
+    // Twinkling effect: oscillate global opacity for this specific particle
+    const twinkle = Math.sin(time * 0.005 + this.offset) * 0.3 + 0.7 // bounds 0.4 -> 1.0
+
+    if (state === 'listening') {
+       r = 0; g = 240; b = 255; a = (0.5 + audioLevel * 0.2) * twinkle;
+    } else if (state === 'processing' || state === 'confused') {
+       r = 180; g = 100; b = 255; a = (0.6 + audioLevel * 0.05) * twinkle;
+    } else if (state === 'navigating') {
+       r = 100; g = 255; b = 150; a = (0.8 + audioLevel * 0.05) * twinkle;
+    } else if (state === 'cooking') {
+       // Warm orange/yellow for cooking
+       r = 255; g = 180; b = 0; a = (0.8 + audioLevel * 0.05) * twinkle;
+    } else if (state === 'booking') {
+       // Deep sky blue for flying
+       r = 60; g = 120; b = 255; a = (0.8 + audioLevel * 0.05) * twinkle;
+    } else if (state === 'idle_hint') {
+       // A soft pulsing cyan for the hint
+       const pulse = Math.sin(time * 0.005) * 0.2 + 0.8;
+       r = 40; g = 200; b = 255; a = pulse * twinkle;
     } else {
-       // Idle color
-       if (isDark) {
-           r = 160; g = 170; b = 180; a = 0.5;
-       } else {
-           r = 100; g = 110; b = 120; a = 0.4;
-       }
+       // Idle color - forced dark mode look
+       r = 160; g = 170; b = 180; a = 0.4 * twinkle;
     }
     
     ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${a})`
     // Add a skeumorphic shadow to each dot to make them feel extruded
-    ctx.shadowColor = isDark ? 'rgba(0,0,0,0.8)' : 'rgba(166, 171, 189, 0.8)'
+    ctx.shadowColor = 'rgba(0,0,0,0.8)' // forced dark mode shadow
     ctx.shadowBlur = 2
     ctx.shadowOffsetX = 1
     ctx.shadowOffsetY = 1
@@ -176,7 +419,7 @@ let particles: Particle[] = []
 
 const initParticles = (width: number, height: number) => {
   particles = []
-  const count = window.innerWidth < 768 ? 100 : 250 // fewer on mobile
+  const count = window.innerWidth < 768 ? 400 : 800 // Crisp resolution bounds
   for (let i = 0; i < count; i++) {
     particles.push(new Particle(width, height))
   }
@@ -187,8 +430,6 @@ const renderCanvas = (time: number) => {
   const canvas = canvasRef.value
   const ctx = canvas.getContext('2d')
   if (!ctx) return
-
-  const isDark = document.documentElement.classList.contains('dark')
   
   // Clear with transparent so the CSS background shows through
   ctx.clearRect(0, 0, canvas.width, canvas.height)
@@ -198,20 +439,21 @@ const renderCanvas = (time: number) => {
   
   // Create a simulated audio level that bounces
   let audioLevel = 0
-  if (currentState.value === 'listening' || currentState.value === 'speaking') {
+  if (currentState.value === 'listening' || isSpeaking.value) {
       // smooth random noise for audio level
       audioLevel = (Math.sin(time * 0.01) * 0.5 + 0.5) * (Math.random() * 0.5 + 0.5) * 20
   }
 
   particles.forEach(p => {
     p.update(currentState.value, time, cx, cy, audioLevel)
-    p.draw(ctx, isDark, audioLevel, currentState.value)
+    p.draw(ctx, audioLevel, currentState.value, time)
   })
 
   animationFrameId = requestAnimationFrame(renderCanvas)
 }
 
 const resizeCanvas = () => {
+    isMobile.value = window.innerWidth < 768
     if(!canvasRef.value) return
     const container = canvasRef.value.parentElement
     if(container) {
@@ -221,10 +463,24 @@ const resizeCanvas = () => {
     }
 }
 
+const handleMouseMove = (e: MouseEvent) => {
+    if(!canvasRef.value) return
+    const rect = canvasRef.value.getBoundingClientRect()
+    mouseX.value = e.clientX - rect.left
+    mouseY.value = e.clientY - rect.top
+    
+    // reset hint 
+    if (currentState.value === 'idle' || currentState.value === 'idle_hint') {
+        if (currentState.value === 'idle_hint') currentState.value = 'idle'
+        resetIdleHintTimer()
+    }
+}
+
 onMounted(() => {
   window.addEventListener('resize', resizeCanvas)
   resizeCanvas() // Initial size setup
   animationFrameId = requestAnimationFrame(renderCanvas)
+  resetIdleHintTimer()
   
   // prime voices
   if(window.speechSynthesis) {
@@ -236,6 +492,7 @@ onUnmounted(() => {
   window.removeEventListener('resize', resizeCanvas)
   cancelAnimationFrame(animationFrameId)
   if(window.speechSynthesis) window.speechSynthesis.cancel()
+  if(recognition) recognition.stop()
 })
 </script>
 
@@ -244,14 +501,17 @@ onUnmounted(() => {
     
     <!-- The Neumorphic Central Container -->
     <div 
-      class="neumorphic-orb relative rounded-full flex items-center justify-center transition-all duration-700 ease-[cubic-bezier(0.25,0.8,0.25,1)]"
+      class="neumorphic-orb relative rounded-full flex items-center justify-center transition-all duration-700 ease-[cubic-bezier(0.25,0.8,0.25,1)] shrink-0"
       :class="[
         currentState !== 'idle' ? 'active-inset scale-95' : 'idle-outset scale-100',
         'w-64 h-64 md:w-80 md:h-80'
       ]"
       @click="handleAction"
+      @mouseenter="isHovering = true"
+       @mouseleave="isHovering = false"
+      @mousemove="handleMouseMove"
       role="button"
-      :aria-label="currentState === 'idle' ? 'Start listening' : 'Stop interaction'"
+      :aria-label="(currentState === 'idle' || currentState === 'idle_hint') ? 'Start listening' : 'Stop interaction'"
     >
       <!-- Canvas for the floating braille marks -->
       <canvas 
@@ -263,7 +523,7 @@ onUnmounted(() => {
       <div 
         class="absolute inset-x-0 inset-y-0 rounded-full transition-opacity duration-1000 mix-blend-screen"
         :class="{
-            'opacity-0': currentState === 'idle',
+            'opacity-0': currentState === 'idle' || currentState === 'idle_hint',
             'opacity-40 bg-cyan-400/20 blur-xl': currentState === 'listening',
             'opacity-50 bg-fuchsia-400/20 blur-xl': currentState === 'processing',
             'opacity-60 bg-cyan-300/30 blur-2xl': currentState === 'speaking'
@@ -272,11 +532,49 @@ onUnmounted(() => {
     </div>
     
     <!-- Status Text -->
-    <div class="mt-12 h-8">
-        <p class="font-sans text-sm tracking-widest uppercase font-bold transition-opacity duration-300"
-           :class="currentState === 'idle' ? 'opacity-40' : 'opacity-100 text-cyan-600 dark:text-cyan-400'">
-            {{ currentState }}
+    <div class="mt-14 h-8 text-center flex flex-col items-center justify-center">
+        <p class="font-sans text-xs tracking-[0.2em] uppercase font-bold transition-all duration-500"
+           :class="(currentState === 'idle' || currentState === 'idle_hint') ? 'opacity-30' : 'opacity-100 text-cyan-500 drop-shadow-md scale-105'">
+            <span v-if="currentState === 'idle' || currentState === 'idle_hint'">
+                {{ isMobile ? 'Tap to awaken me' : 'Click to awaken me' }}
+            </span>
+            <span v-else>
+                {{ currentState }}
+            </span>
         </p>
+    </div>
+
+    <!-- Keyboard Fallback -->
+    <div class="mt-10 h-16 flex flex-col items-center justify-center transition-all duration-500 w-full max-w-sm">
+        <transition name="fade" mode="out-in">
+            <button 
+                v-if="(currentState === 'idle' || currentState === 'idle_hint') && !isTyping"
+                @click="isTyping = true; resetIdleHintTimer()"
+                class="neo-btn rounded-full px-6 py-2 text-[10px] font-sans uppercase tracking-[0.15em] font-semibold opacity-70 hover:opacity-100 transition-all"
+            >
+                Use text instead
+            </button>
+            
+            <form v-else-if="isTyping" @submit.prevent="handleManualSubmit" class="flex items-center gap-4 w-full px-4">
+                <input 
+                    type="text" 
+                    v-model="manualInputText"
+                    placeholder="Enter command..."
+                    class="neo-input flex-1 rounded-full px-6 py-3 text-sm font-sans focus:outline-none placeholder-gray-400 dark:placeholder-gray-500 transition-all focus:ring-2 focus:ring-cyan-500/20"
+                    autofocus
+                />
+                <button 
+                    type="submit" 
+                    class="neo-btn rounded-full w-11 h-11 flex items-center justify-center transition-all group hover:text-cyan-500"
+                    aria-label="Send text command"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="translate-x-[1px] group-hover:scale-110 transition-transform">
+                        <path d="m22 2-7 20-4-9-9-4Z"/>
+                        <path d="M22 2 11 13"/>
+                    </svg>
+                </button>
+            </form>
+        </transition>
     </div>
 
   </div>
@@ -314,5 +612,48 @@ onUnmounted(() => {
     box-shadow: 
         inset -8px -8px 16px var(--neo-shadow-light),
         inset 8px 8px 16px var(--neo-shadow-dark);
+}
+
+/* Form Input (Inset Neumorphic) */
+.neo-input {
+    background-color: var(--neo-bg);
+    color: var(--neo-text);
+    box-shadow: 
+        inset -4px -4px 8px var(--neo-shadow-light),
+        inset 4px 4px 8px var(--neo-shadow-dark);
+    border: 1px solid transparent;
+}
+
+/* Secondary Button (Outset Neumorphic) */
+.neo-btn {
+    background-color: var(--neo-bg);
+    color: var(--neo-text);
+    box-shadow: 
+        -4px -4px 10px var(--neo-shadow-light),
+        4px 4px 10px var(--neo-shadow-dark);
+}
+
+.neo-btn:hover {
+    box-shadow: 
+        -6px -6px 14px var(--neo-shadow-light),
+        6px 6px 14px var(--neo-shadow-dark);
+}
+
+.neo-btn:active {
+    box-shadow: 
+        inset -2px -2px 5px var(--neo-shadow-light),
+        inset 2px 2px 5px var(--neo-shadow-dark);
+}
+
+/* Vue Transitions */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+  transform: translateY(5px);
 }
 </style>
