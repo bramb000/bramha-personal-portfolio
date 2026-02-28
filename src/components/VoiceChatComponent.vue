@@ -457,9 +457,16 @@ const resizeCanvas = () => {
     if(!canvasRef.value) return
     const container = canvasRef.value.parentElement
     if(container) {
+        // If the window is resized, the component might squash. 
+        // We only want to ensure the canvas identically matches the orb boundaries.
         canvasRef.value.width = container.clientWidth
         canvasRef.value.height = container.clientHeight
-        initParticles(canvasRef.value.width, canvasRef.value.height)
+        
+        // Only re-init particles if we haven't already or the aspect ratio drastically changed 
+        // to prevent constant resets on mobile scrollbars hiding/showing
+        if (particles.length === 0) {
+            initParticles(canvasRef.value.width, canvasRef.value.height)
+        }
     }
 }
 
@@ -497,7 +504,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="voice-component-inner flex flex-col items-center justify-center p-6 w-full h-full">
+  <div class="voice-component-inner relative flex flex-col items-center justify-center p-6 w-full h-full">
     
     <!-- The Neumorphic Central Container -->
     <div 
