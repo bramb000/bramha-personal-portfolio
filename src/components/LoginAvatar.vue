@@ -127,8 +127,8 @@ const handleEmailInput = () => {
 
 const updateHeadPosition = (currentVal: number) => {
   if (!anim) return;
-  // Max Value updated to 44 to match the approx character width of the new 448px input
-  const maxVal = 44; 
+  // Max Value updated to 35 to match the approx character width of the new smaller input
+  const maxVal = 35; 
   
   // Map input length (0-maxVal) to frame range [3, 9]
   const progress = Math.min(currentVal / maxVal, 1);
@@ -225,9 +225,8 @@ onUnmounted(() => {
 
 .login-card {
   width: 100%;
-  max-width: 800px;
+  max-width: 400px;
   min-height: auto;
-  max-height: 90vh; /* Responsive constraint */
   background: var(--card-bg);
   border-radius: 20px;
   display: flex;
@@ -236,7 +235,6 @@ onUnmounted(() => {
   justify-content: center;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   position: relative;
-  overflow-y: auto; /* Enable internal scrolling if extremely squished, but prefer flex compression */
   padding: 1.5rem;
   font-family: 'Inter', system-ui, sans-serif;
   color: var(--card-text);
@@ -245,14 +243,14 @@ onUnmounted(() => {
 
 .login-card__avatar {
   width: 100%;
-  max-width: 512px;
+  max-width: 192px;
   aspect-ratio: 4 / 3;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-top: -1rem;
   flex-shrink: 1; /* Allow avatar area to compress if needed */
-  max-height: 25vh; /* Prevent the avatar from overtaking the screen */
+  max-height: 144px; /* Prevent the avatar from overtaking the screen */
 }
 
 @media (min-width: 640px) {
@@ -287,7 +285,7 @@ onUnmounted(() => {
 
 .login-card__input-group {
   width: 100%;
-  max-width: 448px;
+  max-width: 100%;
   height: 52px;
   border: 1px solid var(--card-input-border);
   border-radius: 4px;
@@ -330,7 +328,7 @@ onUnmounted(() => {
 
 .login-card__button {
   width: 100%;
-  max-width: 448px;
+  max-width: 100%;
   height: 52px;
   background: #2cd203;
   color: #ffffff;

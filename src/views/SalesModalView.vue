@@ -5,6 +5,7 @@
     :tags="['Vue 3', 'Tailwind', 'Component-Driven']"
     storybook-id="sales-modal-full-view--default"
     container-class="w-full bg-[#f3f4f6] min-h-[600px] flex items-center justify-center p-8"
+    full-screen-class="w-full bg-[#f3f4f6] min-h-screen flex items-center justify-center p-4 sm:p-8 lg:p-12"
   >
     <SalesModal :inline="true" />
   </ExperimentWrapper>

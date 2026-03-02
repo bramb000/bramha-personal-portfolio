@@ -1,6 +1,6 @@
 <template>
   <template v-if="isFullScreen">
-    <div class="min-h-screen w-full flex items-center justify-center p-4 sm:p-8 bg-white overflow-y-auto">
+    <div :class="['@container', fullScreenClass || 'min-h-screen w-full flex items-center justify-center p-4 sm:p-8 bg-white overflow-y-auto']">
       <slot></slot>
     </div>
   </template>
@@ -125,8 +125,10 @@
         </div>
 
         <!-- The @container is crucial here as well. -->
-        <div class="@container w-full h-full overflow-y-auto overflow-x-hidden no-scrollbar" :class="containerClass">
-          <slot></slot>
+        <div class="@container w-full h-full overflow-y-auto overflow-x-hidden no-scrollbar pt-[3.5rem] pb-8 px-2 flex flex-col">
+          <div class="flex-1 w-full h-full relative" :class="containerClass">
+            <slot></slot>
+          </div>
         </div>
       </div>
 
@@ -153,6 +155,7 @@ const props = withDefaults(defineProps<{
   storybookId?: string
   footerNote?: string
   containerClass?: string
+  fullScreenClass?: string
   supportedDevices?: ('desktop' | 'mobile')[]
 }>(), {
   supportedDevices: () => ['desktop', 'mobile']

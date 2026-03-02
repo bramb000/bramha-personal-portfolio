@@ -5,6 +5,7 @@
     :tags="['Vue 3', 'HTML Canvas', 'Neumorphism', 'Web Speech API']"
     storybook-id="none"
     container-class="h-full w-full"
+    full-screen-class="h-screen w-screen"
   >
     <!-- Moved wrapper classes INSIDE the component so Vue's style scoped attributes apply correctly -->
     <div class="w-full h-full flex items-center justify-center voice-sim-wrapper relative rounded-xl sm:rounded-none">
