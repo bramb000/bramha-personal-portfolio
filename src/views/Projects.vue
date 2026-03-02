@@ -6,20 +6,6 @@ const filters = ['All', 'Web Design', 'Game Design']
 
 const projects = [
   {
-    id: 'voice-chat',
-    title: 'AI Voice Chat Simulation',
-    description: 'Bringing your personal assistant to life in a concept that explorates visual communication alongside conversations.',
-    route: '/micro-projects/voice-chat',
-    category: 'Web Design'
-  },
-  {
-    id: 'sales-modal',
-    title: 'Component-Driven Sales Modal',
-    description: 'A beautifully responsive, isolated pricing modal highlighting dynamic, contextual data-driven banners.',
-    route: '/micro-projects/sales-modal',
-    category: 'Web Design'
-  },
-  {
     id: 'login',
     title: 'Login Micro-Interaction',
     description: 'A playful login screen featuring a Lottie animated avatar that tracks your input.',
@@ -34,17 +20,31 @@ const projects = [
     category: 'Web Design'
   },
   {
-    id: 'patapon',
-    title: 'Designing rhythm-combat to feel fun',
-    description: 'Breakdown of interaction and combat design of Patapon to recreate the entire core gameplay interaction system in Unity.',
-    route: '/experiment/patapon',
-    category: 'Game Design'
+    id: 'sales-modal',
+    title: 'Component-Driven Sales Modal',
+    description: 'A beautifully responsive, isolated pricing modal highlighting dynamic, contextual data-driven banners.',
+    route: '/micro-projects/sales-modal',
+    category: 'Web Design'
+  },
+  {
+    id: 'voice-chat',
+    title: 'AI Voice Chat Simulation',
+    description: 'Bringing your personal assistant to life in a concept that explorates visual communication alongside conversations.',
+    route: '/micro-projects/voice-chat',
+    category: 'Web Design'
   },
   {
     id: 'helldivers',
     title: 'Making the UI come to life - Inspired by Helldivers 2',
     description: 'Bringing UI to life with responsive 2D componenet built with 3D assets. Inspired by Helldivers 2.',
     route: '/experiment/helldivers',
+    category: 'Game Design'
+  },
+  {
+    id: 'patapon',
+    title: 'Designing rhythm-combat to feel fun',
+    description: 'Breakdown of interaction and combat design of Patapon to recreate the entire core gameplay interaction system in Unity.',
+    route: '/experiment/patapon',
     category: 'Game Design'
   },
   {
