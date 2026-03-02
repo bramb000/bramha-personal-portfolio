@@ -13,11 +13,11 @@ const projects = [
     category: 'Web Design'
   },
   {
-    id: 'node-graph',
-    title: 'Node Graph Visual Scripting',
-    description: 'Visual Scripting UI with Excel inspired help section.',
-    route: '/node-graph',
-    category: 'Web Design'
+    id: 'helldivers',
+    title: 'Making the UI come to life - Inspired by Helldivers 2',
+    description: 'Bringing UI to life with responsive 2D componenet built with 3D assets. Inspired by Helldivers 2.',
+    route: '/experiment/helldivers',
+    category: 'Game Design'
   },
   {
     id: 'sales-modal',
@@ -34,11 +34,11 @@ const projects = [
     category: 'Web Design'
   },
   {
-    id: 'helldivers',
-    title: 'Making the UI come to life - Inspired by Helldivers 2',
-    description: 'Bringing UI to life with responsive 2D componenet built with 3D assets. Inspired by Helldivers 2.',
-    route: '/experiment/helldivers',
-    category: 'Game Design'
+    id: 'node-graph',
+    title: 'Node Graph Visual Scripting',
+    description: 'Visual Scripting UI with Excel inspired help section.',
+    route: '/node-graph',
+    category: 'Web Design'
   },
   {
     id: 'patapon',
