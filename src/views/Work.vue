@@ -11,7 +11,7 @@ const caseStudies = [
   {
     id: 'guild',
     title: 'Guild of Guardians',
-    description: 'Increasing D7 Retention by 25% through Data-Driven UX',
+    description: 'Increasing D7 retention by 25% and Revenue by 12% through data driven product design',
     tags: ['Mobile Game', 'UX Research', 'Data Analysis'],
     image: guildHero,
     link: '/work/guild-of-guardians'
