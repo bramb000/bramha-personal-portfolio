@@ -13,6 +13,13 @@ const projects = [
     category: 'Web Design'
   },
   {
+    id: 'account-tray',
+    title: 'TP-7 Inspired Account Tray',
+    description: 'A brutalist account tray inspired by Teenage Engineering\'s TP-7. Features a serialised X-axis chip cascade, CSS digit-rolling odometers, and a snap-shut mechanical close.',
+    route: '/micro-projects/account-tray',
+    category: 'Web Design'
+  },
+  {
     id: 'helldivers',
     title: 'Making the UI come to life - Inspired by Helldivers 2',
     description: 'Bringing UI to life with responsive 2D componenet built with 3D assets. Inspired by Helldivers 2.',

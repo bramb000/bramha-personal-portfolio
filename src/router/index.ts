@@ -66,6 +66,11 @@ const routes = [
         component: () => import('../views/SalesModalView.vue')
     },
     {
+        path: '/micro-projects/account-tray',
+        name: 'AccountTray',
+        component: () => import('../views/AccountTrayView.vue')
+    },
+    {
         path: '/micro-projects/voice-chat',
         name: 'VoiceChatSimulation',
         component: () => import('../views/VoiceChatSimulation.vue')

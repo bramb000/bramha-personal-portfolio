@@ -1,0 +1,172 @@
+import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import * as AccountTrayStories from './AccountTray.stories';
+
+<Meta of={AccountTrayStories} />
+
+# Account Tray
+
+A **TP-7-inspired mechanical account tray** that surfaces SaaS usage stats in a brutalist, hardware-adjacent UI. Built with Vue 3 + TypeScript and driven entirely by CSS transitions — no animation libraries.
+
+## Handover Notes for Engineers
+
+- **`perspective-[1000px]` wrapper**: Each stat chip sits inside a div with `perspective` applied via a Tailwind arbitrary value. Do not remove this wrapper — without it the `rotateX` transforms collapse to 2D and the flip loses its depth.
+- **Transition timings are intentional**: Opening uses `500ms` with `cubic-bezier(0.175, 0.885, 0.32, 1.275)` (mechanical spring). Closing uses `80ms / 0ms` (instant snap). Matching this asymmetry is critical; smoothing the close breaks the physical feel.
+- **Digit roller**: Each LCD digit column is a vertically stacked list of `0–9` shifted via `translateY(-N × 14px)`. The transition delay is calculated as `150ms + (chipIndex × 150ms) + 200ms + (digitIndex × 100ms)` — ensure the cascade order matches any new chip ordering.
+- **`backface-visibility: hidden`**: Applied to `.menu-item-face` to prevent the back-face of a chip from showing during its flip. This is set via the scoped `<style>` block, not Tailwind.
+
+<Canvas of={AccountTrayStories.Closed} />
+
+---
+
+## Overview
+
+The component renders a self-contained account tray containing:
+
+1. A **header handle** (the only interactive element for toggling)
+2. An **accordion cavity** that expands upward, revealing three stat chips
+3. Three **stat panels** — each an odometer-style inset LCD display
+4. An **extruded "Manage Usage" button** that physically presses on click
+
+No props are accepted. All state is managed internally via a single `isOpen` ref.
+
+---
+
+## Stories
+
+### Closed (Default)
+
+The header handle is visible. The accordion cavity has zero height. Click the header to open.
+
+<Canvas of={AccountTrayStories.Closed} />
+
+### Open
+
+The accordion is expanded. All three stat chips have flipped into view and the digit rollers have run to their target values.
+
+<Canvas of={AccountTrayStories.Open} />
+
+---
+
+## Colour Palette
+
+<table>
+  <thead>
+    <tr>
+      <th>Token</th>
+      <th>Hex</th>
+      <th>Usage</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Chassis</td>
+      <td><code>#d8d8d8</code></td>
+      <td>Outer tray body and header background</td>
+    </tr>
+    <tr>
+      <td>Cavity</td>
+      <td><code>#d2d2d2</code></td>
+      <td>Flat inner accordion background</td>
+    </tr>
+    <tr>
+      <td>Panel face</td>
+      <td><code>#cfcfcf</code></td>
+      <td>Recessed stat chip surface</td>
+    </tr>
+    <tr>
+      <td>LCD screen</td>
+      <td><code>#111111</code></td>
+      <td>Inset digit roller background</td>
+    </tr>
+    <tr>
+      <td>Digit text</td>
+      <td><code>#ffffff</code></td>
+      <td>Monospace odometer digits</td>
+    </tr>
+    <tr>
+      <td>Accent</td>
+      <td><code>#ff5722</code></td>
+      <td>Chevron button, LED indicator dot, Manage Usage button</td>
+    </tr>
+    <tr>
+      <td>Accent deep</td>
+      <td><code>#bf360c</code></td>
+      <td>Extruded button bottom shadow (physical depth)</td>
+    </tr>
+    <tr>
+      <td>Label text</td>
+      <td><code>#333333</code></td>
+      <td>Uppercase stat labels</td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+## Animation Logic
+
+### Open Sequence
+
+1. **Accordion height** animates from `0 → 276px` using `ease-te-slide` (`cubic-bezier(0.9, 0, 0, 1)`) over `150ms`.
+2. **Chip flips** — each chip starts back-facing (`rotateX(180deg)`) and transitions to `rotateX(0deg)` over `500ms` with a `150ms` stagger between chips.
+3. **Digit rollers** — after the chip has landed, each digit column slides to its target `translateY` offset, staggered `100ms` per digit column.
+4. **Manage Usage button** — rotates in from `rotateX(-90deg)` to `0deg` after all chips have settled.
+
+### Close Sequence
+
+Closing bypasses the full reverse of the open animation:
+
+- `accordion-wrapper` height transitions from `276px → 0px` in `80ms` using `ease-te-snap` (`cubic-bezier(1, 0, 0, 1)`).
+- All chip `transitionDelay` values are set to `0ms` so they instantly snap back.
+
+> The asymmetry between open (slow, serialised) and close (instant snap) is the core of the physical feel.
+
+---
+
+## Accessibility
+
+> Validated via the **Storybook a11y addon** (axe-core).
+
+- The header `<button>` element uses native semantics and is keyboard accessible.
+- The "Manage Usage" `<button>` likewise uses a native `<button>` element.
+- The `tabindex="-1"` on the crank button element (if present) prevents it from receiving focus.
+- Decorative elements (watch knobs, noise texture overlay) use `pointer-events-none`.
+
+---
+
+## Component API
+
+<table>
+  <thead>
+    <tr>
+      <th>Property</th>
+      <th>Value</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Props</strong></td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <td><strong>Events</strong></td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <td><strong>Slots</strong></td>
+      <td>None</td>
+    </tr>
+    <tr>
+      <td><strong>Internal state</strong></td>
+      <td><code>isOpen: Ref&lt;boolean&gt;</code></td>
+    </tr>
+    <tr>
+      <td><strong>Dependencies</strong></td>
+      <td><code>vue</code>, <code>lucide-vue-next</code> (ChevronUp icon)</td>
+    </tr>
+    <tr>
+      <td><strong>Styling</strong></td>
+      <td>Tailwind CSS arbitrary values + scoped CSS for 3D transform helpers</td>
+    </tr>
+  </tbody>
+</table>
