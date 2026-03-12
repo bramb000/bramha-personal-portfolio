@@ -26,9 +26,12 @@ const caseStudies = [
   }
 ]
 
+import posthog from 'posthog-js';
+
 const router = useRouter()
 
-const navigateTo = (path: string) => {
+const navigateTo = (path: string, projectId: string) => {
+  posthog.capture('project_clicked', { project_id: projectId, source: 'work_page' });
   router.push(path)
 }
 
@@ -61,7 +64,7 @@ const filteredProjects = computed(() => {
       <article 
         v-for="project in filteredProjects" 
         :key="project.id" 
-        @click="navigateTo(project.link)"
+        @click="navigateTo(project.link, project.id)"
         class="group cursor-pointer space-y-4"
       >
         <!-- Thumbnail Placeholder -->

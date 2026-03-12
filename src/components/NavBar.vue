@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch } from 'vue';
 import { useTheme } from '../composables/useTheme';
+import posthog from 'posthog-js';
 
 const isMenuOpen = ref(false);
 
@@ -44,6 +45,10 @@ const navLinks = [
   { name: 'Micro-projects', href: '/micro-projects' },
   { name: 'About', href: '/about' },
 ];
+
+const trackContactClick = (source: string) => {
+  posthog.capture('contact_clicked', { source });
+};
 </script>
 <template>
   <nav 
@@ -106,7 +111,7 @@ const navLinks = [
             </svg>
           </button>
 
-          <a href="https://www.linkedin.com/in/bramdal/" target="_blank" class="px-5 py-2 border border-[var(--color-text-charcoal)] rounded-full text-sm font-sans uppercase hover:bg-[var(--color-text-charcoal)] hover:text-[var(--color-cream-bg)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-4 focus-visible:ring-[var(--color-text-charcoal)]">
+          <a href="https://www.linkedin.com/in/bramdal/" target="_blank" @click="trackContactClick('navbar_desktop')" class="px-5 py-2 border border-[var(--color-text-charcoal)] rounded-full text-sm font-sans uppercase hover:bg-[var(--color-text-charcoal)] hover:text-[var(--color-cream-bg)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-4 focus-visible:ring-[var(--color-text-charcoal)]">
             Let's Talk
           </a>
         </div>
@@ -159,7 +164,7 @@ const navLinks = [
           >
             {{ link.name }}
           </router-link>
-           <a href="https://www.linkedin.com/in/bramdal/" target="_blank" class="px-8 py-3 border border-[var(--color-text-charcoal)] rounded-full text-lg font-sans uppercase hover:bg-[var(--color-text-charcoal)] hover:text-[var(--color-cream-bg)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-4 focus-visible:ring-[var(--color-text-charcoal)]">
+           <a href="https://www.linkedin.com/in/bramdal/" target="_blank" @click="trackContactClick('navbar_mobile')" class="px-8 py-3 border border-[var(--color-text-charcoal)] rounded-full text-lg font-sans uppercase hover:bg-[var(--color-text-charcoal)] hover:text-[var(--color-cream-bg)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-4 focus-visible:ring-[var(--color-text-charcoal)]">
             Let's Talk
           </a>
         </div>

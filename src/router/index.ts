@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import posthog from 'posthog-js'
 import Home from '../views/Home.vue'
 
 const routes = [
@@ -77,18 +76,13 @@ const routes = [
     }
 ]
 
+import { setupAnalytics } from '../analytics'
+
 const router = createRouter({
     history: createWebHistory(),
     routes
 })
 
-// Capture pageviews manually for SPA routing
-router.afterEach((to, _from, failure) => {
-    if (!failure) {
-        posthog.capture('$pageview', {
-            $current_url: window.location.origin + to.fullPath
-        })
-    }
-})
+setupAnalytics(router)
 
 export default router

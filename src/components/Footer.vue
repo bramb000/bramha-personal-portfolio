@@ -1,3 +1,15 @@
+<script setup lang="ts">
+import posthog from 'posthog-js'
+
+const trackSocialClick = (platform: string) => {
+  posthog.capture('social_clicked', { platform, source: 'footer' })
+}
+
+const trackEmailClick = () => {
+  posthog.capture('email_clicked', { source: 'footer' })
+}
+</script>
+
 <template>
   <footer class="relative mt-24">
     <!-- Curved Top -->
@@ -46,8 +58,8 @@
         <div class="flex flex-col md:flex-row justify-between items-center gap-4 text-sm font-sans opacity-60">
           <p>&copy; {{ new Date().getFullYear() }} Bramha Dalvi. All rights reserved.</p>
           <div class="flex gap-6">
-             <a href="https://www.linkedin.com/in/bramdal/" target="_blank" class="hover:text-[var(--color-cream-bg)] hover:opacity-100 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-4 focus-visible:ring-offset-[var(--color-text-charcoal)] focus-visible:ring-[var(--color-cream-bg)] rounded-sm">LinkedIn</a>
-             <a href="mailto:hello@bramha.work" class="hover:text-[var(--color-cream-bg)] hover:opacity-100 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-4 focus-visible:ring-offset-[var(--color-text-charcoal)] focus-visible:ring-[var(--color-cream-bg)] rounded-sm">Email</a>
+             <a href="https://www.linkedin.com/in/bramdal/" target="_blank" @click="trackSocialClick('linkedin')" class="hover:text-[var(--color-cream-bg)] hover:opacity-100 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-4 focus-visible:ring-offset-[var(--color-text-charcoal)] focus-visible:ring-[var(--color-cream-bg)] rounded-sm">LinkedIn</a>
+             <a href="mailto:hello@bramha.work" @click="trackEmailClick" class="hover:text-[var(--color-cream-bg)] hover:opacity-100 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-4 focus-visible:ring-offset-[var(--color-text-charcoal)] focus-visible:ring-[var(--color-cream-bg)] rounded-sm">Email</a>
           </div>
         </div>
 

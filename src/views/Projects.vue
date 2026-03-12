@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import posthog from 'posthog-js'
 
 const activeFilter = ref('All')
 const filters = ['All', 'Web Design', 'Game Design']
@@ -67,6 +68,10 @@ const filteredProjects = computed(() => {
   if (activeFilter.value === 'All') return projects
   return projects.filter(p => p.category === activeFilter.value)
 })
+
+const trackMicroProjectClick = (project: any) => {
+  posthog.capture('micro_project_clicked', { project_id: project.id, category: project.category })
+}
 </script>
 
 <template>
@@ -90,6 +95,7 @@ const filteredProjects = computed(() => {
         v-for="project in filteredProjects" 
         :key="project.id"
         :to="project.route" 
+        @click="trackMicroProjectClick(project)"
         class="group block border border-[var(--color-text-charcoal)]/20 p-8 rounded-2xl hover:bg-[var(--color-text-charcoal)] hover:text-[var(--color-cream-bg)] transition-all duration-300 flex flex-col h-full"
       >
         <div class="flex-grow">
