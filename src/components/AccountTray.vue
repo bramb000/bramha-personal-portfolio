@@ -123,11 +123,8 @@ const stats = [
         :class="isOpen ? 'border-b border-[#a0a0a0] z-20' : ''"
       >
         <div class="flex items-center gap-4 relative z-10">
-          <div class="avatar w-12 h-12 rounded-full bg-[#333] border-2 border-transparent flex items-center justify-center text-[#ff5722] font-mono font-bold text-lg shadow-[inset_0_2px_8px_rgba(0,0,0,0.8),0_1px_1px_rgba(255,255,255,0.8)]">
-            TP-7
-          </div>
           <div class="flex flex-col text-left">
-            <span class="font-bold text-[#222] tracking-tight leading-tight uppercase text-sm">Main Account</span>
+            <span class="font-bold text-[#222] tracking-tight leading-tight uppercase text-sm">View Usage</span>
             <span class="text-[10px] text-[#666] font-mono font-bold tracking-[0.2em] uppercase mt-1">Status: Active</span>
           </div>
         </div>

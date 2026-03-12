@@ -6,8 +6,8 @@ import AccountTray from '../components/AccountTray.vue'
 <template>
   <div class="max-w-4xl pt-12 mx-auto px-6 lg:px-0 mb-24">
     <ExperimentWrapper
-      title="TP-7 Inspired Account Tray"
-      description="A brutalist account tray inspired by Teenage Engineering's TP-7. Features a serialised X-axis chip cascade, CSS digit-rolling odometers, and a snap-shut mechanical close."
+      title="Analogue UI Inspired Usage Dashboard"
+      description="A brutalist usage dashboard inspired by analogue UIs. Features a serialised X-axis chip cascade, CSS digit-rolling odometers, and a snap-shut mechanical close."
       :tags="['Web Design', 'Interaction Design', 'Tactile Motion']"
       storybook-id="portfolio-account-tray-tray--docs"
       container-class="bg-[#d8d8d8] relative no-scrollbar"
