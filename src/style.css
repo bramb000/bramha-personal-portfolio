@@ -175,7 +175,7 @@ h3, h4, h5, h6 {
   letter-spacing: 0.1em;
   font-size: 1.1rem;
   cursor: pointer;
-  z-index: 10;
+  z-index: 50;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
@@ -205,36 +205,7 @@ h3, h4, h5, h6 {
   transition: transform 200ms var(--ease-mechanical-spring), background-color 150ms ease;
 }
 
-/* Layer -2: The Boiling Wisp (Shattered Taper) */
-.btn-extruded::before,
-.deadlock-action-btn::before,
-.dl-button-master::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 150%; /* Wider to accommodate the trailing wisp */
-  height: 120%;
-  transform: translate(-50%, -50%);
-  
-  /* Tapered Flame Shape via Mask */
-  background-color: #45F0D1;
-  background-image: var(--grit-texture);
-  background-blend-mode: overlay;
-  background-size: 200% 100%;
-  
-  -webkit-mask-image: var(--ink-splat-silhouette);
-  mask-image: var(--ink-splat-silhouette);
-  -webkit-mask-size: 100% 100%;
-  mask-size: 100% 100%;
-  
-  /* The Shader: Breaks the gradient fade into organic boiling ink */
-  filter: url(#deadlock-ink-boil);
-  
-  z-index: -2;
-  opacity: 0;
-  pointer-events: none;
-}
+
 
 /* Hover/Active States */
 .btn-extruded:hover::after,
@@ -254,8 +225,6 @@ h3, h4, h5, h6 {
 .deadlock-action-btn:hover::before,
 .dl-button-master:hover::before,
 .btn-extruded.active::before {
-  opacity: 1;
-  animation: dl-vfx-flow 1.5s steps(12) infinite;
 }
 
 /* Variances for organic chaos */
@@ -423,14 +392,13 @@ h3, h4, h5, h6 {
 }
 
 /* ── The Navigation Pill (Metallic Ledge & Mechanical Slide) ── */
-.dl-nav-ledge {
+.dl-nav-ledge-bg {
   background: #111113;
   border-bottom: 2px solid #222;
   box-shadow: 
     0 15px 35px rgba(0,0,0,0.9),
     0 5px 10px rgba(0,0,0,0.8),
     inset 0 -1px 0 rgba(139, 115, 71, 0.2);
-  position: relative;
 }
 
 .seg-strip {
@@ -499,38 +467,13 @@ h3, h4, h5, h6 {
 /* Variance for Nav Tapes */
 .seg-btn:nth-child(even)::after { clip-path: var(--tear-2); }
 
-/* Layer -2: The Shattered Taper Wisp */
-.seg-btn::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 150%;
-  height: 120%;
-  transform: translate(-50%, -50%);
-  /* Tapered Flame Shape via Mask */
-  background-color: #45F0D1;
-  background-image: var(--grit-texture);
-  background-blend-mode: overlay;
-  background-size: 200% 100%;
 
-  -webkit-mask-image: var(--ink-splat-silhouette);
-  mask-image: var(--ink-splat-silhouette);
-  -webkit-mask-size: 100% 100%;
-  mask-size: 100% 100%;
-  z-index: -2;
-  filter: url(#deadlock-ink-boil);
-  opacity: 0;
-  pointer-events: none;
-}
 
 .seg-btn.active::after, .seg-btn:hover::after {
   background: #EBE6E0; /* Bone White Tape */
 }
 
 .seg-btn.active::before, .seg-btn:hover::before {
-  opacity: 1;
-  animation: dl-vfx-flow 1.5s steps(12) infinite;
 }
 
 /* ── Metal Plaques (Inventory Tokens) ── */

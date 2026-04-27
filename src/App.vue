@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import NavBar from './components/NavBar.vue';
 import Footer from './components/Footer.vue';
+import WebGLWisp from './components/WebGLWisp.vue';
 import { useCaseTheme } from './composables/useCaseTheme';
 
 const route = useRoute();
@@ -17,6 +18,7 @@ useCaseTheme();
     'flex flex-col min-h-screen font-sans',
     isFullScreen ? 'bg-white h-screen overflow-hidden' : 'bg-[var(--color-bg)] text-[var(--color-text)] selection:bg-[var(--color-border-hi)] selection:text-[#111113]'
   ]">
+    <WebGLWisp v-if="!isFullScreen" />
     <NavBar v-if="!isFullScreen" />
     
     <main :class="['flex-grow w-full', !isFullScreen ? 'max-w-7xl mx-auto px-6 md:px-12 py-12' : '']">
@@ -48,20 +50,6 @@ useCaseTheme();
           <feDisplacementMap in="SourceGraphic" scale="4" />
         </filter>
 
-        <!-- Deadlock Living Ink (Smooth Organic Flow) -->
-        <svg style="position: absolute; width: 0; height: 0;" aria-hidden="true">
-          <filter id="deadlock-ink-boil" x="-50%" y="-50%" width="200%" height="200%">
-            <!-- Static noise field -->
-            <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" result="noise" />
-            <!-- Smoothly slide the noise field to create correlated organic morphing -->
-            <feOffset in="noise" result="movingNoise">
-              <animate attributeName="dx" from="0" to="60" dur="3s" repeatCount="indefinite" />
-              <animate attributeName="dy" from="0" to="30" dur="4s" repeatCount="indefinite" />
-            </feOffset>
-            <!-- Apply displacement -->
-            <feDisplacementMap in="SourceGraphic" in2="movingNoise" scale="30" xChannelSelector="R" yChannelSelector="G" />
-          </filter>
-        </svg>
       </defs>
     </svg>
   </div>

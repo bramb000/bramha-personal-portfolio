@@ -2,6 +2,7 @@
 import { ref, onMounted, onUnmounted, watch } from 'vue';
 import { useTheme } from '../composables/useTheme';
 import posthog from 'posthog-js';
+import { setWispHover, triggerWispClick } from '../composables/wispState';
 
 const isMenuOpen = ref(false);
 
@@ -51,12 +52,17 @@ const trackContactClick = (source: string) => {
 </script>
 
 <template>
+  <div
+    class="dl-nav-ledge-bg fixed top-0 w-full z-40"
+    :class="showNavbar ? 'translate-y-0' : '-translate-y-full'"
+    style="height: 72px; transition: transform 0.3s ease;"
+  ></div>
   <nav 
     :class="[
-      'dl-nav-ledge w-full flex justify-between md:justify-center items-center sticky top-0 z-50',
+      'w-full flex justify-between md:justify-center items-center sticky top-0 z-50 py-4 px-6 md:px-12',
       showNavbar ? 'translate-y-0' : '-translate-y-full'
     ]"
-    style="transition: background-color 0.25s var(--ease-te-snap), color 0.25s var(--ease-te-snap), transform 0.3s ease;"
+    style="height: 72px; transition: background-color 0.25s var(--ease-te-snap), color 0.25s var(--ease-te-snap), transform 0.3s ease;"
   >
     <!-- Mobile Logo -->
     <router-link
@@ -89,6 +95,9 @@ const trackContactClick = (source: string) => {
             v-slot="{ isActive, navigate }"
           >
             <button
+              @mouseenter="(e) => setWispHover(e.currentTarget as HTMLElement)"
+              @mouseleave="() => setWispHover(null)"
+              @mousedown="triggerWispClick"
               @click="navigate"
               :class="['seg-btn', isActive ? 'active' : '']"
               :title="link.name"
@@ -115,6 +124,9 @@ const trackContactClick = (source: string) => {
             href="https://www.linkedin.com/in/bramdal/"
             target="_blank"
             @click="trackContactClick('navbar_desktop')"
+            @mouseenter="(e) => setWispHover(e.currentTarget as HTMLElement)"
+            @mouseleave="() => setWispHover(null)"
+            @mousedown="triggerWispClick"
             class="deadlock-action-btn px-8 py-3 focus-visible:outline-none"
           >
             <span>Let's Talk</span>
